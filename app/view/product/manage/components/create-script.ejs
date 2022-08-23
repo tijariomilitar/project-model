@@ -1,0 +1,23 @@
+<script>
+	document.getElementById("product-create-form").addEventListener("submit", async e => {
+		e.preventDefault();
+
+		const input = document.getElementById('files');
+		if(!input.files.length){ 
+			if(!confirm("Tem certeza que não deseja incluir imagens do seu produto?")) { return false; } 
+		}
+		
+		let data = new FormData();
+		data.append('code', e.target.code.value);
+		data.append('name', e.target.name.value);
+		for(let i in input.files) {
+			data.append('file', input.files[i]);
+		};
+
+		const response = await API.response(Product.create, data);
+		if(!response) { return false; }
+
+		alert(response.done);
+		clearFileList();
+	});
+</script>

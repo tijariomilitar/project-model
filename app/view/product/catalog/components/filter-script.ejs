@@ -1,0 +1,34 @@
+<script>
+	function productFilter(products) {
+		const filter_div = document.getElementById("product-filter-div");
+		filter_div.innerHTML = "";
+
+		products.forEach(product => {
+			let product_div = lib.element.create("div", { class: "box b1 container ground border radius-5 padding-5 margin-top-5" });
+			product_div.append(lib.element.create("div", { 
+				class: "box b4 bold input-show border-st padding-5 center pointer",
+				onclick: `productDetail(${product.id})` 
+			}, product.code));
+			product_div.append(lib.element.create("div", { class: "box b3-4 bold padding-5 center" }, product.name));
+			filter_div.append(product_div);
+		});
+	};
+
+	document.getElementById("product-filter-form").addEventListener("submit", async e => {
+		e.preventDefault();
+
+		const product = {
+			code: e.target.code.value,
+			name: e.target.name.value
+		};
+
+		const products = await API.response(Product.filter, product);
+		if(!products) { return false; }
+
+		lib.display("product-filter-box", "");
+		lib.display("product-detail-box", "none");
+		lib.display("product-image-box", "none");
+
+		productFilter(products);
+	});
+</script>

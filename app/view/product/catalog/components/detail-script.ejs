@@ -1,0 +1,12 @@
+<script>
+	async function productDetail(product_id) {
+		const product = await API.response(Product.findById, product_id);
+		if(!product) { return false; }
+
+		lib.display("product-filter-box", "none");
+		lib.display("product-detail-box", "");
+		lib.display("product-image-box", "");
+
+		drawImages(product.images);
+	};
+</script>

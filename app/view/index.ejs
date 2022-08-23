@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Project model</title>
+	<%- include ("./partials/head") %>
+</head>
+<body>
+	<%- include ("./partials/header") %>
+
+	<section class="container h-center">
+		<div class="box b3 container ground border radius-5 padding-5 margin-top-10">
+			<div class="box b1 lucida-grande bold underline center">Menu</div>
+			<div onclick="window.location.href='/product'" class="box b1 lucida-grande bold border-lg-st radius-5 padding-5 margin-top-5 center pointer">Produtos</div>
+			<div onclick="window.location.href='/product/manage'" class="box b1 lucida-grande bold border-lg-st radius-5 padding-5 margin-top-5 center pointer">Gerir Produtos</div>
+		</div>
+	</section>
+</body>
+<footer>
+	<%- include ("./partials/footer") %>
+</footer>
+</html>

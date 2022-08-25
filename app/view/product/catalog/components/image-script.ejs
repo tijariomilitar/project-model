@@ -29,11 +29,4 @@
 			}
 		};
 	};
-
-	async function imageDelete(id, parent) {
-		let response = await API.response(Product.image.delete, id);
-		if(!response) { return false; }
-
-		parent && parent.remove();
-	};
 </script>

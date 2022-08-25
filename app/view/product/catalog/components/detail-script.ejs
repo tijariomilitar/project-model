@@ -7,6 +7,14 @@
 		lib.display("product-detail-box", "");
 		lib.display("product-image-box", "");
 
+		const detail_div = document.getElementById("product-detail-div");
+		detail_div.innerHTML = "";
+
+		let product_div = lib.element.create("div", { class: "box a1 container ground border radius-5 padding-5 margin-top-5" });
+		product_div.append(lib.element.create("div", { class: "box b4 lucida-grande bold center" }, product.code));
+		product_div.append(lib.element.create("div", { class: "box b3-4 lucida-grande bold center" }, product.name));
+		detail_div.append(product_div);
+
 		drawImages(product.images);
 	};
 </script>

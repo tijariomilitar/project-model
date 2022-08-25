@@ -7,6 +7,8 @@ const { compressImage } = require("../../lib/sharp");
 const Product = require("../../model/product/main");
 Product.image = require("../../model/product/image");
 
+const imageController = require("./image");
+
 const productController = {};
 
 productController.index = async (req, res) => {
@@ -19,26 +21,24 @@ productController.manage = async (req, res) => {
 
 productController.create = async (req, res) => {
 	const product = new Product();
+	product.id = req.body.id;
 	product.code = req.body.code;
 	product.name = req.body.name;
 
 	try {
-		const response = await product.create();
+		let response;
+
+		if(!product.id) {
+			response = await product.create();
+			product.id = response.insertId;
+		} else {
+			response = await product.update();
+		}
+
 		if(response.err) { return res.send({ msg: response.err }); }
 
 		for(let i in req.files){
-			let newPath = await compressImage(req.files[i], 425);
-			let imageData = await uploadFileS3(newPath, req.files[i].filename.split('.')[0] + '.png');
-
-			fs.promises.unlink(newPath);
-			req.files[i].mimetype != 'image/png' && fs.promises.unlink(req.files[i].path);
-
-			let image = new Product.image();
-			image.product_id = response.insertId;
-			image.etag = imageData.ETag.replaceAll(`"`, "");
-			image.url = imageData.Location;
-			image.keycode = imageData.Key;
-			await image.save();
+			let uploadResponse = await imageController.upload(req.files[i], product.id);
 		};
 
 		res.send({ done: "Produto cadastrado com sucesso!" });
@@ -74,6 +74,7 @@ productController.findById = async (req, res) => {
 	try {
 		const product = (await Product.findById(req.params.id))[0];
 		product.images = await Product.image.list(req.params.id);
+
 		res.send({ product });
 	} catch (err) {
 		console.log(err);

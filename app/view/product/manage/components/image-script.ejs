@@ -1,113 +1,39 @@
 <script>
-	const file = document.getElementById("files");
-	let fileStore = [];
+	function drawImages(images) {
+		let image_box = document.getElementById("product-image-div");
+		image_box.innerHTML = "";
 
-	function drawImages(files) {
-		let preview_box = document.getElementById("preview-box");
-		preview_box.innerHTML = "";
+		if(!images.length) {
+			image_box.append(lib.element.create("div", { class: "box b1 lucida-grande bold center" }, "Não foi encontrada nenhuma imagem."));
+		}
 
-		for(let i in files) {
-			if(files[i].image){
-
+		for(let i in images) {
+			if(images[i].url){
 				let image_div = lib.element.create("div", {
 					class: 'ground height-90 width-90 border shadow-hover noselect margin-left-10 relative',
 					style: 'display: inline-block;vertical-align:top;'
 				});
 
 				image_div.append(lib.element.create("img", {
-					src: `${files[i].image}`,
+					src: `${images[i].url}`,
 					class: 'product-image image-fit noselect'
 				}));
 
 				image_div.append(lib.element.create("img", {
-					onclick: `removeFileFromFileList('${files[i].name}')`,
+					onclick: `imageDelete('${images[i].id}', this.parentNode)`,
 					class: "width-30 height-30 remove-icon opacity-out-05 center pointer",
 					src: "https://spaces.jariomilitar.com/erp-images/icon/junk.png"
 				}));
 
-				preview_box.append(image_div);
+				image_box.append(image_div);
 			}
 		};
 	};
 
-	function removeFileFromFileList(imgName) {
-		const dt = new DataTransfer();
-		const input = document.getElementById('files');
-		const { files } = input;
-		const fileStoreRemove = [];
+	async function imageDelete(id, parent) {
+		let response = await API.response(Product.image.delete, id);
+		if(!response) { return false; }
 
-		for (let i = 0; i < files.length; i++) {
-			if (imgName !== files[i].name){
-				dt.items.add(files[i]);
-				fileStoreRemove.push(files[i]);
-			}
-		};
-
-		fileStore = fileStoreRemove;
-		input.files = dt.files;
-		drawImages(input.files);
+		parent && parent.remove();
 	};
-
-	function clearFileList() {
-		const dt = new DataTransfer();
-		const input = document.getElementById('files');
-		const { files } = input;
-
-		fileStore = [];
-		input.files = dt.files;
-		drawImages(input.files);
-	};
-
-	function setFileList(files) {
-		const dt = new DataTransfer();
-		const input = document.getElementById('files');
-
-		for(let i in files){
-			dt.items.add(files[i]);
-		};
-
-		input.files = dt.files;
-		drawImages(input.files);
-	};
-
-	function getFiles(files){
-		let reader = new FileReader();
-
-		function readFile(index) {
-			if(index >= files.length) return setFileList(fileStore);
-
-			reader.onload = (e) => {
-				files[index].image = e.target.result;
-				fileStore.push(files[index]);
-				readFile(index + 1);
-			};
-
-			reader.readAsDataURL(files[index]);
-		};
-
-		readFile(0);
-	};
-
-	function verifyDuplicity(fls, flst) {
-		for(let i in fls) {
-			for(let j in flst) {
-				if(fls[i].name == flst[j].name) {
-					setFileList(flst);
-					alert("Não é permitido adicionar arquivos duplicados");
-					return true;
-				}
-			};
-		};
-
-		return false;
-	};
-
-	file.addEventListener("change", e => {
-		let files = e.target.files;
-
-		let response = verifyDuplicity(files, fileStore);
-		if(response) { return false; }
-
-		getFiles(files);
-	});
 </script>

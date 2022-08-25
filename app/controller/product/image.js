@@ -9,22 +9,25 @@ const fs = require("fs");
 
 const imageController = {};
 
-imageController.upload = async (req, res) => {
-	for(let i in req.files){
-		let newPath = await compressImage(req.files[i], 425);
-		let imageData = await uploadFileS3(newPath, req.files[i].filename.split('.')[0] + '.png');
+imageController.upload = async (file, product_id) => {
+	try {
+		let newPath = await compressImage(file, 425);
+		let imageData = await uploadFileS3(newPath, file.filename.split('.')[0] + '.png');
 
 		fs.promises.unlink(newPath);
-		req.files[i].mimetype != 'image/png' && fs.promises.unlink(req.files[i].path);
+		file.mimetype != 'image/png' && fs.promises.unlink(file.path);
 
-		let image = new Image();
+		let image = new Product.image();
+		image.product_id = product_id;
 		image.etag = imageData.ETag.replaceAll(`"`, "");
 		image.url = imageData.Location;
 		image.keycode = imageData.Key;
 		await image.save();
-	};
-
-	res.send({ done: 'upload realizado com sucesso' });
+		return true;
+	} catch (err) {
+		console.log(err);
+		return false;
+	}
 };
 
 imageController.delete = async (req, res) => {

@@ -8,6 +8,7 @@
 		}
 		
 		let data = new FormData();
+		data.append('id', e.target.id.value);
 		data.append('code', e.target.code.value);
 		data.append('name', e.target.name.value);
 		for(let i in input.files) {
@@ -18,6 +19,34 @@
 		if(!response) { return false; }
 
 		alert(response.done);
+
+		e.target.id.value = "";
+		e.target.code.value = "";
+		e.target.name.value = "";
+
+		lib.display("product-image-box", "none");
 		clearFileList();
 	});
+
+	// function dataURLtoFile(dataurl, filename) {
+	// 	var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+	// 	bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+	// 	while(n--){
+	// 		u8arr[n] = bstr.charCodeAt(n);
+	// 	}
+	// 	return new File([u8arr], filename, {type:mime});
+	// }
+
+	async function productEdit(product_id) {
+		const product = await API.response(Product.findById, product_id);
+		if(!product) { return false; }
+
+		lib.display("product-image-box", "");
+
+		document.getElementById("product-create-form").id.value = product.id;
+		document.getElementById("product-create-form").name.value = product.name;
+		document.getElementById("product-create-form").code.value = product.code;
+
+		drawImages(product.images);
+	};
 </script>
